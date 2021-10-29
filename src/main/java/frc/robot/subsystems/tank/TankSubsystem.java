@@ -11,9 +11,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TankSubsystem extends SubsystemBase {
+
+  public static final double MOTOR_POWER = 5;
+  public static final double TIME_TO_MOVE_1M_WITH_1POWER = 3; // in seconds
+
   private final TalonGroup left;
   private final TalonGroup right;
-// TODO default drivetankcommand
+
+  private double leftPower;
+  private double rightPower;
+
+  // TODO default drivetankcommand
   public TankSubsystem(int fLeftId, int bLeftId, int fRightId, int bRightId) {
     super();
 
@@ -21,19 +29,28 @@ public class TankSubsystem extends SubsystemBase {
     left.setNeutralMode(NeutralMode.Brake);
 
     // TODO determine if this really needs to be inverted
-    right = new TalonGroup(new TalonSRX[] { new TalonSRX(fRightId), new TalonSRX(bRightId) }, true); 
+    right = new TalonGroup(new TalonSRX[] { new TalonSRX(fRightId), new TalonSRX(bRightId) }, true);
     right.setNeutralMode(NeutralMode.Brake);
+
+    // initialize motor power
+    leftPower = 0;
+    rightPower = 0;
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    // TODO: odometry
+    left.set(ControlMode.PercentOutput, leftPower);
+    right.set(ControlMode.PercentOutput, rightPower);
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  public void setDrivePowers(double leftPower, double rightPower) {
+    this.leftPower = leftPower;
+    this.rightPower = rightPower;
   }
 
   /**
@@ -43,11 +60,11 @@ public class TankSubsystem extends SubsystemBase {
    * @param angularScale Scale in the rotational direction, from 1 to -1,
    *                     clockwise to counterclockwise.
    */
-  public void setDrivePowers(double yScale, double angularScale) {
-    setDrivePowers(yScale, angularScale, true);
+  public void setDrivePowersScaled(double yScale, double angularScale) {
+    setDrivePowersScaled(yScale, angularScale, true);
   }
 
-  public void setDrivePowers(double yScale, double angularScale, boolean squareInput) {
+  public void setDrivePowersScaled(double yScale, double angularScale, boolean squareInput) {
     // Square the input if needed for finer control
     if (squareInput) {
       yScale = Math.copySign(yScale * yScale, yScale);
@@ -64,6 +81,10 @@ public class TankSubsystem extends SubsystemBase {
 
     left.set(ControlMode.PercentOutput, leftPower);
     right.set(ControlMode.PercentOutput, rightPower);
+  }
+
+  public double calculateTime(double meters) {
+    return meters * TIME_TO_MOVE_1M_WITH_1POWER * MOTOR_POWER;
   }
 
   public void followPathCommand() {

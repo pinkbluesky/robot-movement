@@ -16,8 +16,7 @@ public class DriveTankCommand extends CommandBase {
   private double angularScale;
   private boolean squareInput;
 
-
- //TODO can we concentrate this into one
+  // TODO can we concentrate this into one
   public DriveTankCommand(TankSubsystem tankSubsystem, double yScale, double angularScale) {
     this(tankSubsystem, yScale, angularScale, true);
   }
@@ -26,7 +25,7 @@ public class DriveTankCommand extends CommandBase {
     super();
 
     this.tankSubsystem = tankSubsystem;
-    
+
     addRequirements(tankSubsystem);
 
     this.yScale = yScale;
@@ -37,15 +36,15 @@ public class DriveTankCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void initialize() {
-    tankSubsystem.setDrivePowers(yScale, angularScale, squareInput);
+    tankSubsystem.setDrivePowersScaled(yScale, angularScale, squareInput);
   }
 
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 
   public void end() {
-    tankSubsystem.setDrivePowers(0,0, false);
+    tankSubsystem.setDrivePowersScaled(0, 0, false);
   }
 }
