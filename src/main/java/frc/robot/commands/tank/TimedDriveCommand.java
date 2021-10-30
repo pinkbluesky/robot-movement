@@ -39,10 +39,10 @@ public class TimedDriveCommand extends CommandBase {
     public void execute() {
         // set motor power
         if (forward) {
-            tankSubsystem.setDrivePowers(TankSubsystem.MOTOR_POWER, TankSubsystem.MOTOR_POWER);
+            tankSubsystem.setDrivePowers(TankSubsystem.MOTOR_POWER, 0);
         } else {
             // negative power for backward movement
-            tankSubsystem.setDrivePowers(-TankSubsystem.MOTOR_POWER, -TankSubsystem.MOTOR_POWER);
+            tankSubsystem.setDrivePowers(-TankSubsystem.MOTOR_POWER, 0);
         }
     }
 

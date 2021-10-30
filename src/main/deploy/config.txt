@@ -1,6 +1,9 @@
 # drive motors CAN IDs
 fLeft = 3
 fRight = 1
+# middle CAN IDs are temporary values
+mLeft = 5
+mRight = 6
 bLeft = 4
 bRight = 2
 

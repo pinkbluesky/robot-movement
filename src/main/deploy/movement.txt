@@ -2,3 +2,8 @@ forward 2s
 backward 2s
 forward 2m
 backward 2m
+rotate left
+rotate right 
+rotate 180
+rotate 360
+rotate -90

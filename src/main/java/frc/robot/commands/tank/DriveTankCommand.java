@@ -36,7 +36,7 @@ public class DriveTankCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void initialize() {
-    tankSubsystem.setDrivePowersScaled(yScale, angularScale, squareInput);
+    tankSubsystem.setDrivePowers(yScale, angularScale, squareInput);
   }
 
   @Override
@@ -45,6 +45,6 @@ public class DriveTankCommand extends CommandBase {
   }
 
   public void end() {
-    tankSubsystem.setDrivePowersScaled(0, 0, false);
+    tankSubsystem.setDrivePowers(0, 0, false);
   }
 }

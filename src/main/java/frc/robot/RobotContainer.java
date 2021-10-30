@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.tank.DistanceDriveCommand;
 import frc.robot.commands.tank.DriveTankCommand;
+import frc.robot.commands.tank.ReadInstructionsCommand;
 import frc.robot.commands.tank.TimedDriveCommand;
 import frc.robot.commands.elevator.ElevatorUpCommand;
 import frc.robot.commands.elevator.ElevatorDownCommand;
@@ -51,7 +52,7 @@ public class RobotContainer {
 
   // Commands
   private final DriveTankCommand tankCommand;
-  private SequentialCommandGroup tankCommandGroup;
+  private final ReadInstructionsCommand readInstructionsCommand;
 
   // Helper field variables
   Properties config;
@@ -74,7 +75,8 @@ public class RobotContainer {
 
     // Instantiate subsystems
     tankSubsystem = new TankSubsystem(Integer.parseInt(config.getProperty("fLeft")),
-        Integer.parseInt(config.getProperty("bLeft")), Integer.parseInt(config.getProperty("fRight")),
+        Integer.parseInt(config.getProperty("mLeft")), Integer.parseInt(config.getProperty("bLeft")),
+        Integer.parseInt(config.getProperty("fRight")), Integer.parseInt(config.getProperty("mRight")),
         Integer.parseInt(config.getProperty("bRight")));
 
     elevatorSubsystem = new ElevatorSubsystem(Integer.parseInt(config.getProperty("elevator_master")),
@@ -87,54 +89,11 @@ public class RobotContainer {
     elevatorSubsystem.setDefaultCommand(new ElevatorStopCommand(elevatorSubsystem));
 
     // drive tank using movement file
-    tankCommandGroup = null;
-    try {
-      BufferedReader br = new BufferedReader(
-          new FileReader(new File(Filesystem.getDeployDirectory(), TANK_MOVEMENT_CONFIG_PATH)));
-
-      List<Command> tankCommands = new ArrayList<Command>();
-
-      String str;
-      // read the file line-by-line
-      while ((str = br.readLine()) != null) {
-        System.out.println(str);
-        String[] arr = str.split(" ");
-
-        // if command is a drive command
-        if (arr[0].equals("forward") || arr[0].equals("backward")) {
-          boolean forward = arr[0].equals("forward");
-          char movementUnit = arr[1].charAt(arr[1].length() - 1);
-          double movementNumber = Integer.parseInt(arr[1].substring(0, arr[1].length() - 1));
-
-          // if in seconds, add new timed drive command
-          if (movementUnit == 's') {
-            tankCommands.add(new TimedDriveCommand(tankSubsystem, forward, movementNumber));
-          }
-          // if in meters, add new distance drive command
-          else if (movementUnit == 'm') {
-            tankCommands.add(new DistanceDriveCommand(tankSubsystem, forward, movementNumber));
-          }
-
-        }
-        // if command is a turn command
-        else if (arr[0].equals("turn")) {
-          // TODO
-        }
-      }
-
-      // create and schedule the tank command group
-      tankCommandGroup = new SequentialCommandGroup(tankCommands.toArray(new Command[tankCommands.size()]));
-
-      CommandScheduler.getInstance().schedule(tankCommandGroup);
-      System.out.println("SCHEDULED TANK GROUP");
-
-    } catch (IOException e) {
-      System.out.println("Reading movement config file failed.");
-      e.printStackTrace();
-    }
+    readInstructionsCommand = new ReadInstructionsCommand(tankSubsystem, TANK_MOVEMENT_CONFIG_PATH);
+    CommandScheduler.getInstance().schedule(readInstructionsCommand);
 
     // put tank command group on the SmartDashboard for testing
-    SmartDashboard.putData("Move Tank", tankCommandGroup);
+    SmartDashboard.putData("Move Tank", readInstructionsCommand);
 
     // Configure the button bindings
     configureButtonBindings();

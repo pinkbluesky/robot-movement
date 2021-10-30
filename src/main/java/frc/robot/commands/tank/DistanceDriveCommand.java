@@ -22,24 +22,26 @@ public class DistanceDriveCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void initialize() {
+        tankSubsystem.resetQuadraturePosition();
+
         System.out.println((forward ? "forward " : "backward ") + meters + "m");
     }
 
     @Override
     public void execute() {
-        System.out.println("executing");
         // set motor power
         if (forward) {
-            tankSubsystem.setDrivePowers(TankSubsystem.MOTOR_POWER, TankSubsystem.MOTOR_POWER);
+            tankSubsystem.setDrivePowers(TankSubsystem.MOTOR_POWER, 0);
         } else {
             // negative power for backward movement
-            tankSubsystem.setDrivePowers(-TankSubsystem.MOTOR_POWER, -TankSubsystem.MOTOR_POWER);
+            tankSubsystem.setDrivePowers(-TankSubsystem.MOTOR_POWER, 0);
         }
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        // finished if both the left and right side have travelled enough distance
+        return (tankSubsystem.getLeftDisplacement() >= meters) && (tankSubsystem.getRightDisplacement() >= meters);
     }
 
     public void end() {
